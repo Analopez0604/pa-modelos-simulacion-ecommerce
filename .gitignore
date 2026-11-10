@@ -1,0 +1,22 @@
+# Entorno virtual
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# La telemetria (datos/*.csv), los resultados (datos/*.json) y las figuras
+# (docs/figuras/*.png) SI se suben: la guia pide evidencia real en el repo.
+
+# Corridas de demostracion (simulacion --rapido y cargas lanzadas desde el panel)
+docs/rapido/
+datos/gateway_panel_*.json
+
+# Sistema
+.DS_Store
+.ipynb_checkpoints/
+
+# PDF de la Entrega 1: tiene las cédulas del grupo, no se sube al repo público
+docs/PA_E1_*.pdf
+
+# Credenciales
+.env

@@ -1,0 +1,13 @@
+# Librerías para correr el proyecto en tu computador (no en Docker):
+#   - sistema_real/gateway.py   (generador de carga)
+#   - simulacion/               (modelo en SimPy)
+#   - analisis/                 (calibración y contraste M/M/c)
+#   - panel.py                  (panel visual: streamlit run panel.py)
+# La API tiene sus propias librerías en sistema_real/requirements.txt.
+simpy==4.1.1
+numpy==2.1.1
+scipy==1.14.1
+pandas==2.2.3
+matplotlib==3.9.2
+requests==2.32.3
+streamlit==1.67.0
