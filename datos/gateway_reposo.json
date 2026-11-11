@@ -1,0 +1,35 @@
+{
+  "escenario": "reposo",
+  "fecha": "2026-11-07T22:51:27",
+  "duracion_etapa_s": 30.0,
+  "semilla": 42,
+  "parametros": {
+    "timeout_cliente_s": 5.0,
+    "max_reintentos": 3,
+    "prob_reintento": 0.6,
+    "paciencia_weibull_k": 2.0,
+    "paciencia_weibull_escala_s": 22.57,
+    "intervalo_polling_s": 5.0
+  },
+  "etapas": [
+    {
+      "etapa": 1,
+      "lecturas_s": 0,
+      "compras_s": 0,
+      "operaciones": 0,
+      "peticiones": 0,
+      "amplificacion": 0,
+      "completadas": 0,
+      "rechazadas": 0,
+      "timeouts": 0,
+      "errores": 0,
+      "tasa_no_atendidas": 0,
+      "compras": 0,
+      "abandono_compras": 0,
+      "p95_ms": null,
+      "p99_ms": null,
+      "cpu_media_pct": 0.2,
+      "cpu_max_pct": 0.7
+    }
+  ]
+}
