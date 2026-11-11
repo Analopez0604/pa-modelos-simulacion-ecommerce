@@ -117,12 +117,72 @@ oferta.
 
 ### 3.2 Parámetros y Distribuciones de Entrada del Modelo SimPy
 
+| Parámetro | Etapa / Proceso | Distribución y Parámetros Exactos | Unidad | Fuente / Evidencia |
+| :--- | :--- | :--- | :--- | :--- |
+| Llegadas de lectores (normal / oferta) | Entrada | Poisson no homogénea, λ₁ = 9, λ₂ = 180 | comp/s | Entrega 1 (90 %, ×20) |
+| Llegadas de compradores (normal / oferta) | Entrada | Poisson no homogénea, λ₁ = 1, λ₂ = 6 | comp/s | Entrega 1 (10 %, ×6) |
+| Servicio: lectura | Nodo | Lognormal (μ = −5,158, σ = 0,530), media 6,6 ms | s | `telemetry_log.csv` |
+| Servicio: carrito | Nodo | Lognormal (μ = −4,752, σ = 0,443), media 9,5 ms | s | `telemetry_log.csv` |
+| Servicio: pago | Nodo | Lognormal (μ = −4,446, σ = 0,534), media 13,5 ms | s | `telemetry_log.csv` |
+| Servicio: consulta de orden | Nodo | Lognormal (μ = −5,264, σ = 0,618), media 6,3 ms | s | `telemetry_log.csv` |
+| Procesar una orden | Worker | Uniforme (0,15; 0,40), media medida 0,28 | s | `ordenes_log_*.csv` |
+| Arranque de un nodo | Autoescalado | Uniforme (120; 480) | s | Entrega 1 |
+| Paciencia | Comprador | Weibull (k = 2, escala = 22,57), media 20 | s | Entrega 1, corregida |
+| Reintentos | Comprador | 60 % reintenta; hasta 3; espera 1·2ⁿ × U(0,5; 1,5) | s | Entrega 1 |
+
+**Cómo se obtuvieron las Lognormales.** Tomamos los datos con el nodo descargado (CPU < 30 %).
+A la latencia de cada tipo le ajustamos una Lognormal y una Exponencial, y las comparamos con
+la prueba de Kolmogórov-Smirnov [2]. La Exponencial se rechaza en los cuatro tipos (D = 0,28–0,34,
+p < 10⁻¹¹). La Lognormal queda mucho más cerca (D = 0,08–0,13): se acepta al 5 % para carrito
+(p = 0,07) y consulta (p = 0,11). Para lectura y pago se rechaza, pero eso es normal con
+tantos datos (n = 1 613 lecturas), porque KS detecta diferencias muy pequeñas. La latencia
+medida dentro de la API (3,7 ms una lectura) no incluye todo el trabajo del nodo, como recibir
+la conexión y armar la respuesta. Por eso dejamos la σ medida y movimos μ para que el promedio
+dé el D = 7,4 ms de la ley de utilización.
+
+![Ajuste Lognormal vs. Exponencial (lectura)](figuras/calibracion_ajuste_lectura.png)
+
 
 ## 4. Diseño Experimental y Contraste Analítico (M/M/c vs. SimPy)
+
+- **Horizonte simulado:** 60 min = 20 de operación normal + 10 de oferta + 30 después.
+- **Calentamiento (warm-up):** 5 min que no se cuentan, porque el modelo arranca vacío.
+- **Réplicas:** 30 por política (semillas `1000..1029`, las mismas para todas las políticas)
+  y 10 por punto en el barrido de capacidad (P4).
+- **Políticas (patrón Strategy):** la actual es un autoescalado reactivo como el de
+  Kubernetes [3]: cada 30 s pide ⌈CPU usada / umbral⌉ nodos.
+- **Estadísticos:** media ± semiancho del IC 95 % con t de Student [2], y p95 y p99 por
+  réplica.
 
 
 ### 4.1 Tabla de Validación Analítica (Régimen Estacionario Exponencial)
 
+Pusimos el mismo modelo SimPy [4] en modo M/M/c (llegadas Poisson constantes, servicio
+Exponencial, cola infinita, sin timeout ni abandono) y lo comparamos con las fórmulas de
+Erlang C [5], con los números de la sección 7 de la Entrega 1: μ = 25 pet/s y c = 6. Lq y L los medimos mirando el sistema cada segundo, y Wq y W
+promediando cada petición. Corrimos 30 réplicas de 30 min.
+
+| Métrica | λ = 40 M/M/c | SimPy | Error | λ = 135 M/M/c | SimPy | Error |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| Utilización (ρ) | 0,2667 | 0,2665 ± 0,0006 | 0,1 % | 0,9000 | 0,8992 ± 0,0008 | 0,1 % |
+| Longitud media de cola (Lq) | 0,0023 | 0,0027 ± 0,0006 | 15,1 % | 6,661 | 6,650 ± 0,118 | 0,2 % |
+| Espera media en cola (Wq) | 0,058 ms | 0,061 ± 0,003 ms | 4,0 % | 49,34 ms | 49,26 ± 0,87 ms | 0,2 % |
+| Tiempo medio en el sistema (W) | 40,06 ms | 40,04 ± 0,06 ms | 0,0 % | 89,34 ms | 89,26 ± 0,87 ms | 0,1 % |
+
+Con λ = 105 y 120 los errores son de 2,4 % o menos ([`contraste_mmc.md`](contraste_mmc.md)).
+El 15 % de Lq con λ = 40 es solo 0,0004 peticiones. Con ρ = 0,27 casi nadie espera, y con un
+número tan pequeño el error relativo se ve más grande de lo que es. **Ley de Little:** L medido
+y λ · W medido difieren menos de 0,5 % en los cuatro casos.
+
+**Qué cambia con la dinámica real.** Con ρ = 0,9, si cambiamos el servicio Exponencial por la
+Lognormal medida (misma media, menos variable), Wq baja de 49,3 a 33,0 ms: menos variabilidad,
+menos cola. Con ρ = 1,2, M/M/c no tiene solución porque la cola crece sin parar (a los 30 min
+la espera ya es de 205 s). En cambio, con el tope de acceso, el timeout, los reintentos y el
+abandono, el sistema se estabiliza en W = 0,66 s **rechazando el 38 %** de las peticiones.
+Esto, más la oferta que cambia con el tiempo y lo que tardan los nodos en arrancar, es lo que
+el modelo analítico no puede representar. Por eso hace falta simular.
+
+![Contraste M/M/c](figuras/contraste_mmc.png)
 
 ## 5. Resultados de la Simulación y Evaluación de Políticas de Decisión
 
@@ -195,3 +255,18 @@ Usamos IA como lo permite la guía del curso, sobre todo para escribir y revisar
 
 ### 6.3 Referencias
 
+[1] N. Bronson, A. Aghayev, A. Charapko y T. Zhu, "Metastable failures in distributed systems",
+en *Proc. Workshop on Hot Topics in Operating Systems (HotOS '21)*, Ann Arbor, MI, EE. UU.,
+2021, pp. 221-227. doi: 10.1145/3458336.3465286.
+
+[2] A. M. Law, *Simulation Modeling and Analysis*, 5.ª ed. Nueva York, NY, EE. UU.:
+McGraw-Hill Education, 2015.
+
+[3] Kubernetes, "Horizontal Pod Autoscaling", documentación oficial. [En línea]. Disponible:
+https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/
+
+[4] Team SimPy, "SimPy: Discrete event simulation for Python", documentación oficial.
+[En línea]. Disponible: https://simpy.readthedocs.io
+
+[5] J. F. Shortle, J. M. Thompson, D. Gross y C. M. Harris, *Fundamentals of Queueing Theory*,
+5.ª ed. Hoboken, NJ, EE. UU.: John Wiley & Sons, 2018.
