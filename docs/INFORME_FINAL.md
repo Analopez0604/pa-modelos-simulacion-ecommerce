@@ -122,10 +122,10 @@ oferta.
 | :--- | :--- | :--- | :--- | :--- |
 | Llegadas de lectores (normal / oferta) | Entrada | Poisson no homogénea, λ₁ = 9, λ₂ = 180 | comp/s | Entrega 1 (90 %, ×20) |
 | Llegadas de compradores (normal / oferta) | Entrada | Poisson no homogénea, λ₁ = 1, λ₂ = 6 | comp/s | Entrega 1 (10 %, ×6) |
-| Servicio: lectura | Nodo | Lognormal (μ = −5,158, σ = 0,530), media 6,6 ms | s | `telemetry_log.csv` |
-| Servicio: carrito | Nodo | Lognormal (μ = −4,752, σ = 0,443), media 9,5 ms | s | `telemetry_log.csv` |
-| Servicio: pago | Nodo | Lognormal (μ = −4,446, σ = 0,534), media 13,5 ms | s | `telemetry_log.csv` |
-| Servicio: consulta de orden | Nodo | Lognormal (μ = −5,264, σ = 0,618), media 6,3 ms | s | `telemetry_log.csv` |
+| Servicio: lectura | Nodo | Lognormal (μ = −5,158, σ = 0,530), media 6,6 ms, desv. est. 3,8 ms | s | `telemetry_log.csv` |
+| Servicio: carrito | Nodo | Lognormal (μ = −4,752, σ = 0,443), media 9,5 ms, desv. est. 4,4 ms | s | `telemetry_log.csv` |
+| Servicio: pago | Nodo | Lognormal (μ = −4,446, σ = 0,534), media 13,5 ms, desv. est. 7,8 ms | s | `telemetry_log.csv` |
+| Servicio: consulta de orden | Nodo | Lognormal (μ = −5,264, σ = 0,618), media 6,3 ms, desv. est. 4,3 ms | s | `telemetry_log.csv` |
 | Procesar una orden | Worker | Uniforme (0,15; 0,40), media medida 0,28 | s | `ordenes_log_*.csv` |
 | Arranque de un nodo | Autoescalado | Uniforme (120; 480) | s | Entrega 1 |
 | Paciencia | Comprador | Weibull (k = 2, escala = 22,57), media 20 | s | Entrega 1, corregida |
@@ -226,9 +226,10 @@ leerlas juntas.
   razón es que la política actual paga el segundo nodo unos 10 min y el pre-escalado unos
   20 min. Con 3 nodos también se cumple, pero cuesta 105 nodos·min (+50 %) y no mejora nada.
 - **P4. Capacidad máxima sostenible.** Con demanda constante (90/10), **un nodo cumple el
-  SLA hasta 90 compradores/s** (CPU 96 %). A 100 compradores/s ya deja sin atender el 10,6 %,
+  SLA de servicio (no atendidas < 10 %) hasta 90 compradores/s**, aunque con la CPU al 96 %.
+  Si además exigimos CPU < 85 %, un nodo llega hasta 80 compradores/s (83 %). A 100 compradores/s ya deja sin atender el 10,6 %,
   igual que el nodo real en la prueba escalonada (10,6 %). **Dos nodos aguantan hasta 140
-  compradores/s**. De ahí para arriba el límite ya no es la CPU sino los 2 workers de órdenes
+  compradores/s** (CPU 77 %). De ahí para arriba el límite ya no es la CPU sino los 2 workers de órdenes
   (unas 7 órdenes/s): la cola de órdenes se llena y los pagos reciben 503.
 
 ![Capacidad de 1 y 2 nodos](figuras/sim_capacidad.png)
