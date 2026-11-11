@@ -116,12 +116,12 @@ sistema real ──gateway.py──> datos/*.csv ──calibrar.py──> parame
 
 ## Documento
 
-[`docs/PA_E1_Grupo2_GemeloEcommerce.pdf`](docs/)
+[Informe final](docs/INFORME_FINAL.md)
 
 ## Integrantes
 
 | Integrante | Rol |
 | --- | --- |
-| Ana Isabel López Durán | Desarrolladora Frontend |
-| Gerónimo Álvarez Saldarriaga | Desarrollador Backend |
-| Brandon Steven Vidal Jaramillo | QA |
+| Ana Isabel López Durán | Modelo de simulación e integración del repositorio |
+| Gerónimo Álvarez Saldarriaga | Sistema real: API, contenedores y mediciones |
+| Brandon Steven Vidal Jaramillo | Generador de carga, calibración y contraste analítico |

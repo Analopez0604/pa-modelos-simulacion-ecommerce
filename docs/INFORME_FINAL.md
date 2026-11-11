@@ -74,6 +74,7 @@ de CPU → servicio Lognormal → respuesta. Un reintento repite la misma petici
 | Solo existía el README | API en Docker con base de datos y telemetría, modelo SimPy, contraste M/M/c y experimentos | `sistema_real/`, `simulacion/`, `analisis/` |
 | Ruta de escritura (carrito y pagos) incompleta | Carrito → pago (encola la orden, responde 202) → consulta de la orden cada 5 s | `simulacion/modelo.py` (`comprador_compra`), diagrama 2.1 |
 | Lognormales sin parámetros completos | μ y σ ajustados con los datos medidos para cada tipo de petición (tabla 3.2) | `analisis/calibrar.py` |
+| Commits de los tres integrantes | Cada integrante subió su parte desde su cuenta y en su rama, la mayoría con Pull Request (Ana la simulación y el panel, Gerónimo el sistema real y las mediciones, Brandon el generador de carga, la calibración y el contraste). Cada uno subió también sus secciones del informe | historial de Git e Insights → Contributors |
 | Tiempos de servicio supuestos (40/60/250 ms) | Reemplazados por lo medido en el sistema real | `simulacion/parametros_calibrados.json` |
 | Paciencia Exponencial ("sin memoria") | Weibull k = 2: la probabilidad de irse crece con la espera, que es lo que significa impaciencia | `simulacion/parametros.py` |
 | "Máximo 3 reintentos" con espera 1-2-4 s, pero el código nunca llegaba a 4 s | 3 reintentos = 4 intentos en total | `simulacion/modelo.py` (`con_reintentos`) |
