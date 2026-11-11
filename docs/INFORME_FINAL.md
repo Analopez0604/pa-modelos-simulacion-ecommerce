@@ -84,6 +84,36 @@ de CPU → servicio Lognormal → respuesta. Un reintento repite la misma petici
 
 ### 3.1 Sistema real y telemetría
 
+`docker compose up --build -d` levanta PostgreSQL, la API (FastAPI, 40 hilos, máximo 100
+peticiones a la vez) y 2 workers de órdenes. La API solo puede usar **0,5 CPU**. Lo pusimos
+así para que la oferta la sature con la carga que alcanza a generar un portátil (era el plan
+B de la Tabla 16 de la Entrega 1). La API guarda una fila por petición en
+`datos/telemetry_log.csv`. El generador de carga `sistema_real/gateway.py` usa el mismo
+comprador del modelo y guarda la CPU en `datos/cpu_log.csv`.
+
+**Prueba escalonada** (30 s por etapa). Con la **ley de utilización U = X · D** sacamos
+cuánto tiempo de nodo gasta cada petición (D = U / X):
+
+| Demanda (compradores/s) | 10 | 20 | 30 | 40 | 50 | 60 | 80 | 100 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| Utilización del nodo U (%) | 8 | 19 | 28 | 39 | 38 | 48 | 75 | 101 |
+| Peticiones atendidas X (por s) | 11 | 23 | 37 | 48 | 59 | 78 | 96 | 118 |
+| D = U / X (ms) | 7,6 | 8,1 | 7,6 | 8,1 | 6,3 | 6,1 | 7,8 | 8,6 |
+| p95 (s) | 0,02 | 0,03 | 0,02 | 0,02 | 0,02 | 0,05 | 0,66 | 2,9 |
+| No atendidas (%) | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 10,6 |
+
+En las 7 etapas sin rechazos, **D = 7,4 ± 0,8 ms**. A 100 compradores/s el nodo llega al
+100 % y deja de cumplir el SLA.
+
+![Prueba escalonada del sistema real](figuras/calibracion_escalonada_real.png)
+
+**Prueba de pico** (1 nodo, 1 minuto de oferta con 180 lecturas + 6 compras por segundo,
+3 repeticiones en `datos/gateway_pico_r*.json`). Las tres usan la misma semilla del generador
+(42), así que son la misma carga repetida y no tres réplicas independientes. En 2 de las 3, la
+CPU del nodo promedió 98 % en el segundo minuto de la oferta y el p95 pasó de 2 s (3,0 s y
+4,9 s). En una de ellas no se atendió el 40 % de las peticiones. Un nodo no alcanza para la
+oferta.
+
 
 ### 3.2 Parámetros y Distribuciones de Entrada del Modelo SimPy
 
