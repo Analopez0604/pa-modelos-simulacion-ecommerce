@@ -1,0 +1,179 @@
+{
+  "origen": "analisis/calibrar.py sobre la prueba escalonada del sistema real",
+  "cpu_nodo": 0.5,
+  "servicio_lognormal_cpu": {
+    "lectura": [
+      -5.157671692092929,
+      0.5300795739695563
+    ],
+    "carrito": [
+      -4.751765910573162,
+      0.4427468946871172
+    ],
+    "pago": [
+      -4.446251010865711,
+      0.5343462705633322
+    ],
+    "consulta_orden": [
+      -5.263566224500351,
+      0.6181767242894936
+    ]
+  },
+  "demanda_cpu_ms": {
+    "media": 7.382813131860039,
+    "desv": 0.8130248100734714
+  },
+  "capacidad_nodo_pet_s": 135.44972385723358,
+  "ajuste_latencia": {
+    "lectura": {
+      "n": 1613,
+      "mu": -5.747713658034067,
+      "sigma": 0.5300795739695563,
+      "media_ms": 3.6712558548673617,
+      "ks_lognormal_D": 0.08288934980853563,
+      "ks_lognormal_p": 4.3406436028773977e-10,
+      "ks_exponencial_D": 0.31744383722880637,
+      "ks_exponencial_p": 5.003436021931224e-145,
+      "proporcion": 0.7587017873941675
+    },
+    "carrito": {
+      "n": 171,
+      "mu": -5.3418078765143004,
+      "sigma": 0.4427468946871172,
+      "media_ms": 5.280177997751902,
+      "ks_lognormal_D": 0.0978399220825536,
+      "ks_lognormal_p": 0.0707333354856543,
+      "ks_exponencial_D": 0.34255668857975335,
+      "ks_exponencial_p": 2.0318711918298176e-18,
+      "proporcion": 0.08043273753527752
+    },
+    "pago": {
+      "n": 171,
+      "mu": -5.036292976806849,
+      "sigma": 0.5343462705633322,
+      "media_ms": 7.494918597645769,
+      "ks_lognormal_D": 0.1256247602102275,
+      "ks_lognormal_p": 0.008227474075354546,
+      "ks_exponencial_D": 0.32539522235433854,
+      "ks_exponencial_p": 1.2774578570164176e-16,
+      "proporcion": 0.08043273753527752
+    },
+    "consulta_orden": {
+      "n": 171,
+      "mu": -5.853608190441489,
+      "sigma": 0.6181767242894936,
+      "media_ms": 3.473693092426212,
+      "ks_lognormal_D": 0.09124275476244031,
+      "ks_lognormal_p": 0.10896186053691803,
+      "ks_exponencial_D": 0.2767005927332264,
+      "ks_exponencial_p": 4.579587463856199e-12,
+      "proporcion": 0.08043273753527752
+    }
+  },
+  "worker_ordenes_s": {
+    "media": 0.27798455937702793,
+    "min": 0.15190399999999998,
+    "max": 0.48489800000000005
+  },
+  "etapas": [
+    {
+      "etapa": 1,
+      "U": 0.0848,
+      "X_pet_s": 11.1,
+      "D_ms": 7.6424,
+      "ofrecidas_pet_s": 11.1,
+      "p95_cliente_ms": 19.7,
+      "no_atendidas": 0.0,
+      "lecturas_s": 9,
+      "compras_s": 1
+    },
+    {
+      "etapa": 2,
+      "U": 0.1883,
+      "X_pet_s": 23.2,
+      "D_ms": 8.1161,
+      "ofrecidas_pet_s": 23.2,
+      "p95_cliente_ms": 27.9,
+      "no_atendidas": 0.0,
+      "lecturas_s": 18,
+      "compras_s": 2
+    },
+    {
+      "etapa": 3,
+      "U": 0.2784,
+      "X_pet_s": 36.5667,
+      "D_ms": 7.6143,
+      "ofrecidas_pet_s": 36.5667,
+      "p95_cliente_ms": 19.6,
+      "no_atendidas": 0.0,
+      "lecturas_s": 27,
+      "compras_s": 3
+    },
+    {
+      "etapa": 4,
+      "U": 0.391,
+      "X_pet_s": 48.4333,
+      "D_ms": 8.072,
+      "ofrecidas_pet_s": 48.4333,
+      "p95_cliente_ms": 23.7,
+      "no_atendidas": 0.0,
+      "lecturas_s": 36,
+      "compras_s": 4
+    },
+    {
+      "etapa": 5,
+      "U": 0.3761,
+      "X_pet_s": 59.3667,
+      "D_ms": 6.3345,
+      "ofrecidas_pet_s": 59.3667,
+      "p95_cliente_ms": 23.0,
+      "no_atendidas": 0.0,
+      "lecturas_s": 45,
+      "compras_s": 5
+    },
+    {
+      "etapa": 6,
+      "U": 0.4792,
+      "X_pet_s": 78.2333,
+      "D_ms": 6.1259,
+      "ofrecidas_pet_s": 78.2333,
+      "p95_cliente_ms": 46.0,
+      "no_atendidas": 0.0,
+      "lecturas_s": 54,
+      "compras_s": 6
+    },
+    {
+      "etapa": 7,
+      "U": 0.7479,
+      "X_pet_s": 96.2,
+      "D_ms": 7.7746,
+      "ofrecidas_pet_s": 96.2,
+      "p95_cliente_ms": 658.8,
+      "no_atendidas": 0.0,
+      "lecturas_s": 72,
+      "compras_s": 8
+    },
+    {
+      "etapa": 8,
+      "U": 1.0102,
+      "X_pet_s": 117.7333,
+      "D_ms": 8.5805,
+      "ofrecidas_pet_s": 131.7,
+      "p95_cliente_ms": 2945.0,
+      "no_atendidas": 0.106,
+      "lecturas_s": 90,
+      "compras_s": 10
+    },
+    {
+      "etapa": 9,
+      "U": 0.8233,
+      "X_pet_s": 166.3333,
+      "D_ms": 4.9498,
+      "ofrecidas_pet_s": 174.7,
+      "p95_cliente_ms": 4989.2,
+      "no_atendidas": 0.3471,
+      "lecturas_s": 108,
+      "compras_s": 12
+    }
+  ]
+}
