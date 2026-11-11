@@ -1,0 +1,13 @@
+# Configuración de Streamlit para el panel visual (streamlit run panel.py).
+# Streamlit lo lee solo, porque está en .streamlit/ junto al script.
+# Tema del panel. Sigue el modo claro u oscuro del sistema.
+[theme]
+# El mismo azul de las gráficas.
+primaryColor = "#2a78d6"
+font = "sans-serif"
+borderColor = "#d9d8d3"
+showWidgetBorder = true
+
+[browser]
+# No mandarle a Streamlit estadísticas anónimas de uso.
+gatherUsageStats = false
