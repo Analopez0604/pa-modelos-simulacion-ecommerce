@@ -1,0 +1,71 @@
+# Sistema real: la base (db), la tienda (api) y 2 workers que procesan los pagos.
+# Prender: docker compose up --build -d    Apagar: docker compose down (con -v borra la base)
+services:
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ecommerce
+      POSTGRES_PASSWORD: ecommerce
+      POSTGRES_DB: ecommerce
+    command: ["postgres", "-c", "max_connections=60"]
+    # La API y los workers no arrancan hasta que la base responda que está lista.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecommerce"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: sistema_real/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: postgresql+psycopg2://ecommerce:ecommerce@db:5432/ecommerce
+      HILOS_ACCESO: "40"          # cuántas peticiones se atienden a la vez
+      LIMITE_CONCURRENCIA: "100"  # más de 100 peticiones adentro -> responde 503 (lleno)
+      POOL_SIZE: "10"             # conexiones a la base que se reutilizan
+      MAX_OVERFLOW: "0"           # no se abren conexiones extra
+      POOL_TIMEOUT: "5"           # si espera una conexión más de 5 s -> 503
+      CARPETA_DATOS: /datos
+    # Los CSV quedan en la carpeta datos/ del proyecto.
+    volumes:
+      - ./datos:/datos
+    ports:
+      - "8000:8000"
+    # Medio núcleo de CPU, para que la oferta lo sature con la carga que genera un portátil.
+    # Este medio núcleo es lo que en la simulación llamamos "un nodo".
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+
+  # Misma imagen de la tienda, pero corre app/worker.py en vez de la API.
+  worker:
+    build:
+      context: .
+      dockerfile: sistema_real/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["python", "-m", "app.worker"]
+    environment:
+      DB_URL: postgresql+psycopg2://ecommerce:ecommerce@db:5432/ecommerce
+      POOL_SIZE: "2"              # procesa una orden a la vez, no necesita más
+      MAX_OVERFLOW: "0"
+      CARPETA_DATOS: /datos
+      INTERVALO_SONDEO: "0.2"
+    volumes:
+      - ./datos:/datos
+    # Son 2 workers. Uno solo procesa unas 3,6 órdenes/s y en la oferta llegan
+    # 6 compras/s, así que la cola crecería sin parar. Con 2 sí alcanza.
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
