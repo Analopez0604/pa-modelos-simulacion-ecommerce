@@ -33,7 +33,15 @@ Requisitos: Docker y Python 3.11+.
 
 ```bash
 # 0. Una sola vez: entorno de Python para la simulación y el análisis
+
+## 0.1. UNIX (Mac/Linux)
 python -m venv .venv && source .venv/bin/activate
+
+## 0.1. Windows
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+
+## 0.2
 pip install -r requirements.txt
 
 # 1. Levantar el sistema real (API + 2 workers + PostgreSQL)
